@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "@src/App.tsx";
-import Counter from "@features/Counter/Counter.tsx";
 import NotFound from "@features/NotFound.tsx";
+import TodoList from "@features/todos/TodoList.tsx";
 
 const router = createBrowserRouter([
 	{
@@ -12,7 +12,7 @@ const router = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <Counter />,
+						element: <TodoList />,
 					},
 				],
 			},
