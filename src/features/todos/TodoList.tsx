@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import {
 	Form,
 	FormControl,
@@ -16,10 +15,11 @@ import {
 	useGetTodosQuery,
 	useUpdateTodoMutation,
 } from "@src/api/apiSlice.ts";
+import { FaRegTrashAlt } from "react-icons/fa";
 
 export interface ITodo {
 	userId: number;
-	id: string;
+	id: number;
 	title: string;
 	completed: boolean;
 }
@@ -29,8 +29,6 @@ const formSchema = z.object({
 });
 
 const TodoList = () => {
-	const [newTodo, setNewTodo] = useState<string>("");
-
 	const {
 		data: todos,
 		isLoading,
@@ -50,8 +48,12 @@ const TodoList = () => {
 	});
 
 	const onSubmit = () => {
-		addTodo({ userId: 1, title: newTodo, completed: false });
-		setNewTodo("");
+		addTodo({
+			userId: 1,
+			title: form.getValues().todoItem,
+			completed: false,
+		});
+		form.reset();
 	};
 
 	const newTodoSection = (
@@ -88,23 +90,39 @@ const TodoList = () => {
 		content = <p>Loading...</p>;
 	} else if (isSuccess) {
 		content = (
-			<div className="mb-5 mt-5 rounded-xl border border-gray-200 p-2">
+			<div className="mb-5 mt-5 rounded-xl border border-gray-200">
 				{todos.map((todo: ITodo) => {
 					return (
 						<div
 							key={todo.id}
-							className="group flex items-center justify-between rounded-md p-2 transition-all duration-300 ease-in-out hover:cursor-pointer hover:bg-gray-100"
+							className="group flex items-center justify-between p-2 transition-all duration-300 ease-in-out hover:cursor-pointer hover:bg-gray-100"
 						>
 							<span
-								className={`${todo.completed ? "text-gray-300" : "text-gray-500"} transition-all duration-300 ease-in-out group-hover:text-black`}
+								className={`${todo.completed ? "text-gray-400" : "text-black"} flex flex-row transition-all duration-300 ease-in-out group-hover:text-black`}
 							>
 								{todo.title}
 							</span>
 							&nbsp;
-							<span
-								className={`text-xs font-bold uppercase text-gray-200 transition-all duration-300 ease-in-out ${todo.completed ? "group-hover:text-green-700" : "group-hover:text-red-700"}`}
-							>
-								{todo.completed ? "completed" : "incomplete"}
+							<span className="flex flex-row gap-3">
+								<span
+									className="ml-2 hidden items-center justify-center group-hover:flex"
+									onClick={() => deleteTodo(todo.id)}
+								>
+									<FaRegTrashAlt />
+								</span>
+								<span
+									className={`rounded p-1 text-xs font-bold uppercase opacity-50 outline outline-[0.11rem] group-hover:opacity-100 ${todo.completed ? "text-green-700" : "text-red-700"} transition-all duration-300 ease-in-out`}
+									onClick={() =>
+										updateTodo({
+											...todo,
+											completed: !todo.completed,
+										})
+									}
+								>
+									{todo.completed
+										? "completed"
+										: "incomplete"}
+								</span>
 							</span>
 						</div>
 					);
